@@ -25,7 +25,10 @@ app.include_router(demo.router)
 
 @app.on_event("startup")
 def on_startup():
-    create_tables()
+    try:
+        create_tables()
+    except Exception as e:
+        print(f"DB startup warning: {e}")
 
 
 @app.get("/health")

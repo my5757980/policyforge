@@ -5,7 +5,11 @@ import os
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./policyforge.db")
 
-engine = create_engine(DATABASE_URL, echo=False)
+connect_args = {}
+if DATABASE_URL.startswith("postgresql"):
+    connect_args = {"connect_timeout": 10}
+
+engine = create_engine(DATABASE_URL, echo=False, pool_pre_ping=True, connect_args=connect_args)
 
 
 def create_tables():
