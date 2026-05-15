@@ -6,8 +6,20 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     ...options,
   })
   if (!res.ok) {
-    const err = await res.text()
-    throw new Error(err || `HTTP ${res.status}`)
+    const text = await res.text()
+    let msg = `Request failed (${res.status})`
+    try {
+      const json = JSON.parse(text)
+      const detail = json?.detail ?? ""
+      if (typeof detail === "string") {
+        if (detail.includes("API key not valid") || detail.includes("API_KEY_INVALID")) {
+          msg = "Gemini API key is not configured. Add a valid GEMINI_API_KEY to the backend .env file."
+        } else {
+          msg = detail.slice(0, 200)
+        }
+      }
+    } catch {}
+    throw new Error(msg)
   }
   return res.json()
 }
