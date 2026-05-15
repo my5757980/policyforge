@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  lobstertrap:
+    image: veeainc/lobstertrap:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ../backend/configs/policies:/app/policies:ro
+    environment:
+      - LOBSTERTRAP_CONFIG=/app/config.yaml
+      - LOBSTERTRAP_POLICIES_DIR=/app/policies
+    restart: unless-stopped

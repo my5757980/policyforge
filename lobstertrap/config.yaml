@@ -1,0 +1,19 @@
+server:
+  port: 8080
+  upstream: https://generativelanguage.googleapis.com
+
+logging:
+  level: info
+  audit_file: /tmp/lobstertrap_audit.log
+
+inspection:
+  enabled: true
+  extract_pii: true
+  extract_intents: true
+  risk_scoring: true
+
+policies_dir: /app/policies
+
+default_policy:
+  action: LOG
+  log: true
