@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolicyForge — Live Demo | TechEx 2026</title>
+<meta property="og:title" content="PolicyForge — AI Agent Security Demo">
+<meta property="og:description" content="Write AI security policies in plain English. Gemini converts to Lobster Trap YAML — instantly enforced.">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  min-height:100vh;
+  font-family:'Segoe UI', system-ui, sans-serif;
+  background:#060b14;
+  color:#fff;
+}
+.grid-bg {
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(rgba(0,200,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,255,.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+}
+.orb1 {
+  position:fixed; width:600px; height:600px;
+  background:radial-gradient(circle, rgba(0,180,255,.12) 0%, transparent 70%);
+  top:-200px; right:-100px; border-radius:50%; pointer-events:none; z-index:0;
+}
+.orb2 {
+  position:fixed; width:400px; height:400px;
+  background:radial-gradient(circle, rgba(120,0,255,.1) 0%, transparent 70%);
+  bottom:-100px; left:-50px; border-radius:50%; pointer-events:none; z-index:0;
+}
+
+.container {
+  position:relative; z-index:1;
+  max-width:960px; margin:0 auto; padding:48px 24px 64px;
+}
+
+/* Header */
+.header { text-align:center; margin-bottom:40px; }
+.logo-row {
+  display:inline-flex; align-items:center; gap:14px;
+  margin-bottom:16px;
+}
+.shield {
+  width:52px; height:52px;
+  background:linear-gradient(135deg,rgba(0,200,255,.15),rgba(120,0,255,.15));
+  border:2px solid rgba(0,200,255,.35); border-radius:12px;
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  box-shadow:0 0 24px rgba(0,200,255,.2);
+}
+.brand {
+  font-size:42px; font-weight:900; letter-spacing:-1px;
+  background:linear-gradient(135deg,#fff 30%,#00c8ff 65%,#7800ff);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.tagline { font-size:17px; color:rgba(255,255,255,.5); margin-bottom:20px; line-height:1.6; }
+.tagline strong { color:rgba(255,255,255,.85); }
+.tags { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.tag {
+  border-radius:20px; padding:5px 14px; font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px;
+}
+.t-blue   { background:rgba(0,200,255,.1);  border:1px solid rgba(0,200,255,.3);  color:#00c8ff; }
+.t-purple { background:rgba(120,0,255,.12); border:1px solid rgba(120,0,255,.35); color:#b060ff; }
+.t-gold   { background:rgba(255,184,0,.1);  border:1px solid rgba(255,184,0,.3);  color:#ffb800; }
+.t-green  { background:rgba(0,255,136,.1);  border:1px solid rgba(0,255,136,.3);  color:#00ff88; }
+
+/* Video wrapper */
+.video-wrapper {
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(0,200,255,.2);
+  border-radius:16px; overflow:hidden;
+  margin-bottom:32px;
+  box-shadow:0 0 60px rgba(0,200,255,.08), 0 24px 80px rgba(0,0,0,.5);
+}
+.video-top-bar {
+  background:#0d1320; padding:10px 16px;
+  display:flex; align-items:center; gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.dots { display:flex; gap:6px; }
+.dr { width:12px; height:12px; border-radius:50%; background:#ff5f57; }
+.dy { width:12px; height:12px; border-radius:50%; background:#febc2e; }
+.dg { width:12px; height:12px; border-radius:50%; background:#28c840; }
+.vurl {
+  flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+  border-radius:6px; padding:4px 12px; font-size:11px;
+  color:rgba(255,255,255,.4); font-family:'Consolas',monospace; margin:0 16px;
+}
+.live-chip {
+  background:rgba(255,50,80,.1); border:1px solid rgba(255,50,80,.3);
+  border-radius:6px; padding:3px 10px; font-size:11px; font-weight:700; color:#ff4060;
+  display:flex; align-items:center; gap:5px;
+}
+.live-dot { width:6px; height:6px; border-radius:50%; background:#ff4060; animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+video {
+  width:100%; display:block;
+  background:#000;
+}
+
+/* Feature grid */
+.features {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:32px;
+}
+.feat {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:12px; padding:18px; text-align:center;
+}
+.feat .fi { font-size:26px; margin-bottom:10px; }
+.feat .ft { font-size:13px; font-weight:700; margin-bottom:5px; }
+.feat .fd { font-size:11px; color:rgba(255,255,255,.4); line-height:1.5; }
+
+/* CTA row */
+.cta-row {
+  display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:36px;
+}
+.cta-btn {
+  display:flex; align-items:center; gap:8px;
+  padding:12px 24px; border-radius:10px;
+  font-size:14px; font-weight:700; text-decoration:none;
+  transition:transform .15s, box-shadow .15s;
+}
+.cta-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.3); }
+.btn-primary {
+  background:linear-gradient(135deg,#00c8ff,#7800ff);
+  color:#fff;
+}
+.btn-secondary {
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15); color:#fff;
+}
+.btn-green {
+  background:rgba(0,255,136,.1); border:1px solid rgba(0,255,136,.3); color:#00ff88;
+}
+
+/* Timeline */
+.timeline { margin-bottom:40px; }
+.tl-title { font-size:13px; font-weight:700; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; text-align:center; }
+.tl-items { display:flex; gap:0; align-items:center; }
+.tl-item { flex:1; text-align:center; position:relative; }
+.tl-item::after {
+  content:''; position:absolute; top:16px; right:-50%;
+  width:100%; height:1px; background:rgba(0,200,255,.2); z-index:0;
+}
+.tl-item:last-child::after { display:none; }
+.tl-num {
+  width:32px; height:32px; border-radius:50%;
+  background:rgba(0,200,255,.1); border:1px solid rgba(0,200,255,.3);
+  color:#00c8ff; font-size:12px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 8px; position:relative; z-index:1;
+}
+.tl-label { font-size:11px; color:rgba(255,255,255,.5); line-height:1.4; }
+.tl-time { font-size:10px; color:rgba(0,200,255,.6); font-weight:700; margin-top:3px; }
+
+/* Footer */
+.footer { text-align:center; padding-top:32px; border-top:1px solid rgba(255,255,255,.06); }
+.footer p { font-size:12px; color:rgba(255,255,255,.25); margin-bottom:8px; }
+.footer strong { color:rgba(255,255,255,.45); }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="orb1"></div>
+<div class="orb2"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-row">
+      <div class="shield">🛡️</div>
+      <div class="brand">PolicyForge</div>
+    </div>
+    <p class="tagline">
+      Write AI agent security policies in <strong>plain English</strong>.<br>
+      Gemini converts them to <strong>Lobster Trap YAML</strong> — instantly enforced.
+    </p>
+    <div class="tags">
+      <span class="tag t-blue">⚡ TechEx 2026</span>
+      <span class="tag t-purple">🔐 Track 1: Agent Security</span>
+      <span class="tag t-gold">🏆 $10K Prize Pool</span>
+      <span class="tag t-green">✅ Live Demo</span>
+    </div>
+  </div>
+
+  <!-- Video Player -->
+  <div class="video-wrapper">
+    <div class="video-top-bar">
+      <div class="dots"><div class="dr"></div><div class="dy"></div><div class="dg"></div></div>
+      <div class="vurl">policyforge.vercel.app — Live Demo</div>
+      <div class="live-chip"><div class="live-dot"></div> LIVE</div>
+    </div>
+    <video controls autoplay muted playsinline poster="">
+      <source src="/policyforge-demo.webm" type="video/webm">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline">
+    <div class="tl-title">What you'll see in this demo</div>
+    <div class="tl-items">
+      <div class="tl-item">
+        <div class="tl-num">1</div>
+        <div class="tl-label">Policy Editor</div>
+        <div class="tl-time">0:04</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">2</div>
+        <div class="tl-label">Gemini YAML Gen</div>
+        <div class="tl-time">0:08</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">3</div>
+        <div class="tl-label">Dashboard</div>
+        <div class="tl-time">0:18</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">4</div>
+        <div class="tl-label">Attack Simulator</div>
+        <div class="tl-time">0:26</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">5</div>
+        <div class="tl-label">Compliance Report</div>
+        <div class="tl-time">0:34</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feat">
+      <div class="fi">✍️</div>
+      <div class="ft">Plain English Editor</div>
+      <div class="fd">No YAML or code required</div>
+    </div>
+    <div class="feat">
+      <div class="fi">⚡</div>
+      <div class="ft">Gemini Generation</div>
+      <div class="fd">Policy ready in ~2 seconds</div>
+    </div>
+    <div class="feat">
+      <div class="fi">🔐</div>
+      <div class="ft">Lobster Trap DPI</div>
+      <div class="fd">Real-time enforcement proxy</div>
+    </div>
+    <div class="feat">
+      <div class="fi">📋</div>
+      <div class="ft">HIPAA / SOC2 Reports</div>
+      <div class="fd">One-click compliance audit</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-row">
+    <a href="/" class="cta-btn btn-primary">🚀 Try Live App</a>
+    <a href="/slides.html" class="cta-btn btn-secondary">📊 View Slides</a>
+    <a href="https://github.com/my5757980/policyforge" class="cta-btn btn-secondary" target="_blank">📦 GitHub Repo</a>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Built for <strong>TechEx Intelligent Enterprise Solutions Hackathon 2026</strong></p>
+    <p>Track 1: Agent Security & AI Governance · Powered by <strong>Gemini 2.0 Flash</strong> + <strong>Veea Lobster Trap</strong></p>
+  </div>
+
+</div>
+</body>
+</html>
