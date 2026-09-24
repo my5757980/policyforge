@@ -48,8 +48,8 @@ export default function AuditFeed({ logs }: { logs: AuditLog[] }) {
               <td className="py-2.5 pr-4 text-zinc-300 font-mono text-xs">{log.intent_category || "—"}</td>
               <td className="py-2.5 pr-4 text-zinc-400 font-mono text-xs">{log.matched_rule || "—"}</td>
               <td className="py-2.5">
-                <span className={`font-bold text-xs ${log.risk_score >= 0.7 ? "text-red-400" : log.risk_score >= 0.4 ? "text-yellow-400" : "text-emerald-400"}`}>
-                  {(log.risk_score * 100).toFixed(0)}%
+                <span className={`font-bold text-xs ${log.risk_score == null ? "text-zinc-500" : log.risk_score >= 0.7 ? "text-red-400" : log.risk_score >= 0.4 ? "text-yellow-400" : "text-emerald-400"}`}>
+                  {log.risk_score == null ? "—" : `${(log.risk_score * 100).toFixed(0)}%`}
                 </span>
               </td>
             </tr>

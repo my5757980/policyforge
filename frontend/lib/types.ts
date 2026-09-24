@@ -13,7 +13,7 @@ export interface AuditLog {
   timestamp: string
   action: "BLOCK" | "ALLOW" | "LOG"
   intent_category: string
-  risk_score: number
+  risk_score: number | null  // null: nothing scored it
   matched_rule: string
   prompt_excerpt: string
   attack_type: string
@@ -28,12 +28,16 @@ export interface Metrics {
 }
 
 export interface AttackResult {
-  action: "BLOCK" | "ALLOW"
+  action: "BLOCK" | "ALLOW" | "LOG" | "ERROR"
   intent_category: string
-  risk_score: number
+  risk_score: number | null  // null: nothing scored it
   matched_rule: string
+  matched_policy?: string | null
+  matched_on?: string[]
   message: string
   latency_ms: number
+  engine?: string
+  not_checked?: string[]
 }
 
 export interface AttackType {

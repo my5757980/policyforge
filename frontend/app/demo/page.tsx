@@ -12,6 +12,13 @@ const ATTACK_ICONS: Record<string, string> = {
   data_exfiltration: "📤",
 }
 
+const ACTION_STYLE: Record<string, { box: string; text: string }> = {
+  BLOCK: { box: "bg-red-500/10 border border-red-500/30", text: "text-red-400" },
+  ALLOW: { box: "bg-emerald-500/10 border border-emerald-500/30", text: "text-emerald-400" },
+  LOG: { box: "bg-yellow-500/10 border border-yellow-500/30", text: "text-yellow-400" },
+  ERROR: { box: "bg-zinc-800/60 border border-zinc-700", text: "text-zinc-300" },
+}
+
 export default function DemoPage() {
   const [attacks, setAttacks] = useState<AttackType[]>([])
   const [selected, setSelected] = useState<string | null>(null)
@@ -32,7 +39,7 @@ export default function DemoPage() {
       setResult(res)
       setHistory(h => [{ ...res, type: selected }, ...h].slice(0, 10))
     } catch (e: any) {
-      setResult({ action: "ALLOW", intent_category: "error", risk_score: 0, matched_rule: "", message: e.message, latency_ms: 0 })
+      setResult({ action: "ERROR", intent_category: "", risk_score: null, matched_rule: "", message: `Could not check the attack: ${e.message}`, latency_ms: 0 })
     } finally {
       setFiring(false)
     }
@@ -42,7 +49,7 @@ export default function DemoPage() {
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">Attack Demo</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">Fire real adversarial attacks and watch your policies block them in real-time</p>
+        <p className="text-sm text-zinc-500 mt-0.5">Fire adversarial prompts at your active policies and see what each one really does</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -95,48 +102,52 @@ export default function DemoPage() {
             {firing && (
               <div className="flex flex-col items-center justify-center py-10">
                 <Loader2 className="w-8 h-8 text-red-400 animate-spin mb-3" />
-                <p className="text-sm text-zinc-400">Sending attack through Lobster Trap…</p>
+                <p className="text-sm text-zinc-400">Checking the attack against your active policies…</p>
               </div>
             )}
             {result && !firing && (
               <div className="space-y-4">
-                <div className={`flex items-center gap-3 p-4 rounded-xl ${
-                  result.action === "BLOCK"
-                    ? "bg-red-500/10 border border-red-500/30"
-                    : "bg-emerald-500/10 border border-emerald-500/30"
-                }`}>
-                  {result.action === "BLOCK"
-                    ? <ShieldX className="w-8 h-8 text-red-400 flex-shrink-0" />
-                    : <ShieldCheck className="w-8 h-8 text-emerald-400 flex-shrink-0" />
+                <div className={`flex items-center gap-3 p-4 rounded-xl ${ACTION_STYLE[result.action]?.box ?? ACTION_STYLE.ERROR.box}`}>
+                  {result.action === "BLOCK" || result.action === "ERROR"
+                    ? <ShieldX className={`w-8 h-8 flex-shrink-0 ${ACTION_STYLE[result.action].text}`} />
+                    : <ShieldCheck className={`w-8 h-8 flex-shrink-0 ${ACTION_STYLE[result.action]?.text ?? ""}`} />
                   }
                   <div>
-                    <p className={`text-2xl font-black ${result.action === "BLOCK" ? "text-red-400" : "text-emerald-400"}`}>
+                    <p className={`text-2xl font-black ${ACTION_STYLE[result.action]?.text ?? ""}`}>
                       {result.action}
                     </p>
                     <p className="text-xs text-zinc-400 mt-0.5">{result.message}</p>
                   </div>
                 </div>
 
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Intent</span>
-                    <span className="text-white font-mono text-xs">{result.intent_category}</span>
+                {result.action !== "ERROR" && (
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between gap-3">
+                      <span className="text-zinc-500">Checked by</span>
+                      <span className="text-zinc-300 text-xs text-right">
+                        PolicyForge: keywords + PII{result.not_checked?.includes("intent") ? " (intent not checked)" : ""}
+                      </span>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <span className="text-zinc-500">Policy</span>
+                      <span className="text-white font-mono text-xs">{result.matched_policy || "—"}</span>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <span className="text-zinc-500">Matched Rule</span>
+                      <span className="text-emerald-400 font-mono text-xs">{result.matched_rule || "none"}</span>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <span className="text-zinc-500">Matched on</span>
+                      <span className="text-zinc-300 font-mono text-xs text-right">
+                        {result.matched_on?.length ? result.matched_on.join(", ") : "—"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <span className="text-zinc-500">Check time</span>
+                      <span className="text-zinc-400">{result.latency_ms}ms</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Matched Rule</span>
-                    <span className="text-emerald-400 font-mono text-xs">{result.matched_rule || "none"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Risk Score</span>
-                    <span className={`font-bold ${result.risk_score >= 0.7 ? "text-red-400" : "text-yellow-400"}`}>
-                      {(result.risk_score * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Latency</span>
-                    <span className="text-zinc-400">{result.latency_ms}ms</span>
-                  </div>
-                </div>
+                )}
               </div>
             )}
           </div>
@@ -149,7 +160,7 @@ export default function DemoPage() {
                 {history.map((h, i) => (
                   <div key={i} className="flex items-center justify-between text-xs">
                     <span className="text-zinc-500 capitalize">{h.type.replace(/_/g, " ")}</span>
-                    <span className={`font-bold ${h.action === "BLOCK" ? "text-red-400" : "text-emerald-400"}`}>
+                    <span className={`font-bold ${ACTION_STYLE[h.action]?.text ?? ""}`}>
                       {h.action}
                     </span>
                   </div>

@@ -8,7 +8,7 @@ class AuditLog(SQLModel, table=True):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     action: str  # BLOCK | ALLOW | LOG
     intent_category: str = ""
-    risk_score: float = 0.0
+    risk_score: Optional[float] = None  # no scoring engine yet: left empty rather than invented
     matched_rule: str = ""
     prompt_excerpt: str = ""
     attack_type: str = ""
@@ -19,7 +19,7 @@ class AuditLogResponse(SQLModel):
     timestamp: datetime
     action: str
     intent_category: str
-    risk_score: float
+    risk_score: Optional[float]
     matched_rule: str
     prompt_excerpt: str
     attack_type: str

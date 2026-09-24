@@ -16,3 +16,9 @@ dependencies = [
     "psycopg2-binary>=2.9.9",
     "python-multipart>=0.0.9",
 ]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

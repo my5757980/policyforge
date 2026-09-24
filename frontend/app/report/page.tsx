@@ -29,7 +29,7 @@ function buildMarkdown(report: ComplianceReport): string {
     `| Time | Action | Intent | Rule | Risk |`,
     `|---|---|---|---|---|`,
     ...report.audit_trail.map(l =>
-      `| ${new Date(l.timestamp).toLocaleTimeString()} | **${l.action}** | ${l.intent_category} | ${l.matched_rule} | ${(l.risk_score * 100).toFixed(0)}% |`
+      `| ${new Date(l.timestamp).toLocaleTimeString()} | **${l.action}** | ${l.intent_category} | ${l.matched_rule} | ${l.risk_score == null ? "—" : `${(l.risk_score * 100).toFixed(0)}%`} |`
     ),
     ``,
     `---`,
@@ -185,8 +185,8 @@ export default function ReportPage() {
                       <td className="py-2 pr-3 text-zinc-500">{new Date(l.timestamp).toLocaleTimeString()}</td>
                       <td className={`py-2 pr-3 font-bold ${l.action === "BLOCK" ? "text-red-400" : "text-emerald-400"}`}>{l.action}</td>
                       <td className="py-2 pr-3 text-zinc-400 font-mono">{l.intent_category}</td>
-                      <td className={`py-2 font-bold ${l.risk_score >= 0.7 ? "text-red-400" : "text-yellow-400"}`}>
-                        {(l.risk_score * 100).toFixed(0)}%
+                      <td className={`py-2 font-bold ${l.risk_score == null ? "text-zinc-500" : l.risk_score >= 0.7 ? "text-red-400" : "text-yellow-400"}`}>
+                        {l.risk_score == null ? "—" : `${(l.risk_score * 100).toFixed(0)}%`}
                       </td>
                     </tr>
                   ))}
