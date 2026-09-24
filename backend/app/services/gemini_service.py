@@ -9,8 +9,8 @@ load_dotenv()
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY", ""))
 
-SYSTEM_PROMPT = """You are a Lobster Trap YAML security policy generator for enterprise AI agents.
-Generate ONLY valid YAML following the Lobster Trap policy schema below.
+SYSTEM_PROMPT = """You are a PolicyForge YAML security policy generator for enterprise AI agents.
+Generate ONLY valid YAML following the PolicyForge policy schema below.
 Output NOTHING except the raw YAML block — no markdown, no code fences, no explanation.
 
 Schema:

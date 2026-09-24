@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "PolicyForge — AI Agent Security",
-  description: "Enterprise AI agent security policy platform powered by Gemini + Lobster Trap",
+  description: "Enterprise AI agent security policy platform powered by Gemini",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
