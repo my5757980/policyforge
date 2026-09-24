@@ -1,0 +1,6 @@
+# Keep a local virtualenv, database and secrets out of the image (COPY . . would copy them over it).
+.venv/
+__pycache__/
+*.db
+.env
+tests/

@@ -30,6 +30,13 @@ produced, so none is shown.
 PolicyForge's policy YAML is its own schema. It is not the policy format of Veea Lobster Trap, and
 there is no Lobster Trap proxy in this project.
 
+## What the compliance report shows
+
+The HIPAA, SOC2 and PCI-DSS checklists are evidence from PolicyForge's own policies and audit log, not
+a certification. Each item states what it was checked against (for example "at least one attack was
+blocked"). Items that data cannot show, such as SOC2 CC6.3 and PCI Req 8.2 (PolicyForge has no user
+accounts), are marked **not assessed** instead of ticked. The totals count every audit event.
+
 ---
 
 ## Architecture
@@ -117,7 +124,7 @@ CORS_ORIGINS=http://localhost:3000
 | `DELETE` | `/api/policies/{id}` | Deactivate policy |
 | `GET` | `/api/audit/logs` | Recent audit events |
 | `GET` | `/api/audit/metrics` | Dashboard metrics |
-| `GET` | `/api/audit/report?standard=HIPAA` | Compliance report |
+| `GET` | `/api/audit/report?standard=HIPAA` | Compliance report (`HIPAA`, `SOC2` or `PCI-DSS`; others get 400) |
 | `GET` | `/api/demo/attacks` | Available attack types |
 | `POST` | `/api/demo/attack` | Check a test attack against the active policies |
 

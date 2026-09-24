@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { api } from "@/lib/api"
 import { ComplianceReport } from "@/lib/types"
-import { FileBarChart2, Download, Loader2, CheckCircle2, XCircle } from "lucide-react"
+import { FileBarChart2, Download, Loader2, CheckCircle2, XCircle, MinusCircle } from "lucide-react"
 
 const STANDARDS = ["HIPAA", "SOC2", "PCI-DSS"]
 
@@ -23,7 +23,9 @@ function buildMarkdown(report: ComplianceReport): string {
     ...report.policies.map(p => `- **${p.name}** — ${p.compliance_tags || "No tags"} (created ${new Date(p.created_at).toLocaleDateString()})`),
     ``,
     `## ${report.standard} Compliance Checklist`,
-    ...report.checklist.map(c => `- [${c.status ? "x" : " "}] ${c.item}`),
+    `_Evidence from PolicyForge's own policies and audit log, not a certification._`,
+    ``,
+    ...report.checklist.map(c => `- [${c.status ? "x" : " "}] ${c.item} — ${c.basis}`),
     ``,
     `## Audit Trail (Last 20 Events)`,
     `| Time | Action | Intent | Rule | Risk |`,
@@ -70,8 +72,9 @@ export default function ReportPage() {
     URL.revokeObjectURL(url)
   }
 
-  const passCount = report?.checklist.filter(c => c.status).length ?? 0
-  const totalCount = report?.checklist.length ?? 0
+  const passCount = report?.checklist.filter(c => c.status === true).length ?? 0
+  const assessedCount = report?.checklist.filter(c => c.status !== null).length ?? 0
+  const notAssessed = (report?.checklist.length ?? 0) - assessedCount
 
   return (
     <div className="p-6 space-y-6">
@@ -126,7 +129,7 @@ export default function ReportPage() {
             {[
               { label: "Active Policies", value: report.summary.active_policies, color: "text-sky-400" },
               { label: "Blocked Events", value: report.summary.total_blocked, color: "text-red-400" },
-              { label: "Checklist Pass", value: `${passCount}/${totalCount}`, color: passCount === totalCount ? "text-emerald-400" : "text-yellow-400" },
+              { label: notAssessed ? `Checklist Pass (${notAssessed} not assessed)` : "Checklist Pass", value: `${passCount}/${assessedCount}`, color: assessedCount > 0 && passCount === assessedCount ? "text-emerald-400" : "text-yellow-400" },
             ].map(({ label, value, color }) => (
               <div key={label} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-center">
                 <p className={`text-2xl font-black ${color}`}>{value}</p>
@@ -137,15 +140,21 @@ export default function ReportPage() {
 
           {/* Compliance Checklist */}
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-            <h2 className="font-semibold text-white mb-4">{report.standard} Compliance Checklist</h2>
+            <h2 className="font-semibold text-white mb-1">{report.standard} Compliance Checklist</h2>
+            <p className="text-xs text-zinc-500 mb-4">Evidence from PolicyForge&apos;s own policies and audit log, not a certification.</p>
             <div className="space-y-2.5">
               {report.checklist.map((c, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  {c.status
-                    ? <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    : <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                <div key={i} className="flex items-start gap-3">
+                  {c.status === true
+                    ? <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-400 flex-shrink-0" />
+                    : c.status === false
+                      ? <XCircle className="w-4 h-4 mt-0.5 text-red-400 flex-shrink-0" />
+                      : <MinusCircle className="w-4 h-4 mt-0.5 text-zinc-500 flex-shrink-0" />
                   }
-                  <span className={`text-sm ${c.status ? "text-zinc-300" : "text-zinc-500"}`}>{c.item}</span>
+                  <div>
+                    <span className={`text-sm ${c.status ? "text-zinc-300" : "text-zinc-500"}`}>{c.item}</span>
+                    <p className="text-xs text-zinc-600">{c.basis}</p>
+                  </div>
                 </div>
               ))}
             </div>

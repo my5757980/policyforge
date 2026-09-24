@@ -48,7 +48,8 @@ export interface AttackType {
 
 export interface ChecklistItem {
   item: string
-  status: boolean
+  status: boolean | null  // null: PolicyForge's data cannot show it either way ("not assessed")
+  basis: string           // what the item was checked against
 }
 
 export interface ComplianceReport {
